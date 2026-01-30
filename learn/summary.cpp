@@ -2,6 +2,7 @@
 #include <atomic>
 #include <chrono>
 #include <cstring>
+#include <filesystem>
 #include <iomanip>
 #include <iostream>
 #include <numeric>
@@ -9,9 +10,27 @@
 #include <thread>
 #include <vector>
 
+#ifndef __XMAKE__
+#define __XMAKE__ "XMAKE is not defined"
+#endif
+
 constexpr auto MAX_EXERCISE = 33;
+constexpr auto PROJECT_ROOT = __XMAKE__;
+constexpr auto XMAKE_FALLBACK = "XMAKE is not defined";
 
 int main(int argc, char **argv) {
+    namespace fs = std::filesystem;
+    std::error_code ec;
+    const fs::path project_root{PROJECT_ROOT};
+    const bool has_valid_root = std::strcmp(PROJECT_ROOT, XMAKE_FALLBACK) != 0 && fs::exists(project_root);
+    if (has_valid_root) {
+        fs::current_path(project_root, ec);
+        if (ec) {
+            std::cerr << "Failed to switch current directory to " << project_root << ": " << ec.message() << std::endl;
+            return EXIT_FAILURE;
+        }
+    }
+
     if (argc == 1) {
         Log log{Console{}};
         for (auto i = 0; i <= MAX_EXERCISE; ++i) {

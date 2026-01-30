@@ -5,7 +5,10 @@
 struct Fibonacci {
     int numbers[11];
     // TODO: 修改方法签名和实现，使测试通过
-    int get(int i) {
+    int get(int i) const {
+        constexpr auto COUNT = sizeof(numbers) / sizeof(*numbers);
+        ASSERT(i >= 0 && i < static_cast<int>(COUNT), "i out of range");
+        return numbers[i];
     }
 };
 
